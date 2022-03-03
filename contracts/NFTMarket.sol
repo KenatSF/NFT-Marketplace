@@ -117,8 +117,9 @@ contract NFTMarket is ReentrancyGuard {
 
         require(msg.value == price, "Please, submit the correct price!");
 
-        idMarketItems[itemId].seller.transfer(msg.value);
-        //(bool success, ) = idMarketItem[itemId].seller.call{value: msg.value}("");
+        //idMarketItems[itemId].seller.transfer(msg.value);
+        (bool success1, ) = idMarketItems[itemId].seller.call{value: msg.value}("");
+        require(success1, "Seller payment tx failed!");
 
         IERC721(nftContract).transferFrom(address(this), msg.sender, tokenId);
 
@@ -127,7 +128,10 @@ contract NFTMarket is ReentrancyGuard {
 
         _itemsSold.increment();
 
-        owner.transfer(listingPrice);
+        //owner.transfer(listingPrice);
+        (bool success2, ) = owner.call{value: listingPrice}("");
+        require(success2, "Owner payment tx failed!");
+
         emit ItemBuying(itemId, nftContract, tokenId, idMarketItems[itemId].seller, msg.sender, price, false);
     }
 
